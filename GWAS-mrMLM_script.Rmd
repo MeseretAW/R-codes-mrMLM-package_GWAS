@@ -1,0 +1,83 @@
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+ Multi-Locus Random-SNP-Effect Mixed Linear Model Tools for GWAS
+
+##This repository contains the analysis scripts and data for a Genome-Wide Association Study (GWAS) using Multi-Locus Random-SNP-Effect Mixed Linear Models, as illustrated by Wen et al. (2017). 
+
+## Prerequisites
+
+##Before running the analysis scripts, ensure you are using **R version 3.5 or above**. This is essential for compatibility with the `mrMLM` package and its dependencies.
+
+## Setting Up Your Working Environment
+
+##To begin, set your working directory in R to the location where you have stored the analysis scripts and data files. You can do this by modifying the following command with your specific directory path:
+
+```{r}
+setwd("Your_Working_Directory_Path")
+```
+
+### Install the mrMLM Package and Its Dependencies
+#You can use either the `mrMLM.GUI` or command-based installation.
+
+```{r}
+
+install.packages("mrMLM") # or
+install.packages("mrMLM.GUI")
+
+```
+
+```{r}
+library(mrMLM)
+library(lars)
+library(dplyr)
+library(ROCR)
+library(Rcpp)
+library(emmeans)
+library(lmerTest)
+library(lme4)
+library(Matrix)
+
+```
+
+### Preparing Data
+#The genotypic data and phenotypic data should be prepared in the correct format, as available in the example data folder of the package [mrMLM on #CRAN](https://cran.r-project.org/package=mrMLM).
+
+#Four different input data should be prepared:
+#- Genotypic data
+#- Phenotypic data
+#- Population structure matrix (Q) 
+#- Kinship (K) matrix
+```{r}
+GenotypicData <- read.csv("genotypicdata.csv")
+PhenotypicData <- read.csv("phenotypicdata.csv")
+Kinship <- read.delim2("kinship.txt")
+PopStr <- read.csv("Q-matrix.csv")
+```
+
+##Genome-wide association analysis using mrMLM function from mrMLM package.
+```{r}
+
+mrMLM(fileGen = "GenotypicData",
+      filePhe = "PhenotypicData",
+      fileKin = "Kinship",
+      filePS = "PopStr",
+      Genformat = "Hmp",
+      method = c("ISIS EM-BLASSO", "mrMLM", "FASTmrMLM", "FASTmrEMMA", "pLARmEB", "pKWmEB"),
+      Likelihood = "REML",
+      trait = 1,
+      SearchRadius = 20,
+      CriLOD = 3,
+      Bootstrap = TRUE,
+      DrawPlot = TRUE,
+      Plotformat = "jpeg",
+      dir = "directory_for_results")
+```
+
+#Four different outputs will be produced:
+#1. Final results containing significant marker-trait associations with -log10(p) values, R2 values, and other necessary details.
+#2. Intermediate results.
+#3. The Manhattan plot.
+#4. The QQ-plot.
